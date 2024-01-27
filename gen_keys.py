@@ -2,6 +2,9 @@ from web3 import Web3
 import eth_account
 import os
 
+# Enable the unaudited HDWallet features
+eth_account.Account.enable_unaudited_hdwallet_features()
+
 def get_keys(challenge, keyId=0, filename="eth_mnemonic.txt"):
     """
     Generate a stable private key and sign a message.
@@ -21,6 +24,7 @@ def get_keys(challenge, keyId=0, filename="eth_mnemonic.txt"):
 
     # If we need more mnemonics, generate and save them
     if keyId >= len(mnemonics):
+        # Create a new mnemonic
         new_mnemonic = eth_account.Account.create().address
         mnemonics.append(new_mnemonic + '\n')
         with open(filename, 'w') as file:
