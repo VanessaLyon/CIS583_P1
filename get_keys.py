@@ -1,62 +1,54 @@
 from web3 import Web3
 import eth_account
 import os
-import random
 
+def get_mnemonic(account):
+    """Retrieve the mnemonic for an Ethereum account."""
+    try:
+        mnemonic = account.from_key(account.key).mnemonic
+        return mnemonic
+    except ValueError:
+        print("Account does not have a valid mnemonic.")
+        return None
 
-def generate_mock_mnemonic(num_words=12):
-    """Generate a mock mnemonic phrase with num_words words, with improved randomness."""
-    word_list = [
-        "apple", "banana", "cherry", "date", "elderberry", "fig", "grape", 
-        "honeydew", "kiwi", "lemon", "mango", "nectarine", "orange", "papaya", 
-        "quince", "raspberry", "strawberry", "tangerine", "grapefruit", 
-        "blueberry", "melon", "coconut", "apricot", "pear", "peach", "plum", 
-        "lychee", "lime", "jackfruit", "guava", "pomegranate", "pineapple"
-    ]
-
-    # Shuffle the word list to increase randomness
-    random.shuffle(word_list)
-
-    # Select the first num_words words from the shuffled list
-    return ' '.join(word_list[:num_words])
+def store_mnemonic(mnemonic, filename="eth_mnemonic.txt"):
+    """Store the mnemonic in a file."""
+    with open(filename, 'a') as file:
+        file.write(mnemonic + '\n')
 
 def get_keys(challenge, keyId=0, filename="eth_mnemonic.txt"):
     """
-    Generate a stable private key using mock mnemonics and sign a message.
+    Generate a stable private key and sign a message.
     challenge - byte string
     keyId (integer) - which key to use
-    filename - filename to read and store mock mnemonics
+    filename - filename to read and store mnemonics
     """
 
     w3 = Web3()
 
-    # Check if we have enough mock mnemonics in the file
+
+    # Check if we have enough mnemonics in the file
     try:
         with open(filename, 'r') as file:
-            mock_mnemonics = file.readlines()
+            mnemonics = file.readlines()
     except FileNotFoundError:
-        mock_mnemonics = []
+        mnemonics = []
 
-    # If we need more mock mnemonics, generate and save them
-    if keyId >= len(mock_mnemonics):
-        new_mnemonic = generate_mock_mnemonic()
-        print('new_mnemonic is', new_mnemonic)
-        mock_mnemonics.append(new_mnemonic + '\n')
+    # If we need more mnemonic, generate and save them
+    if keyId >= len(mnemonics):
+        acct = eth_account.Account.create()
+        my_mnem = get_mnemonic(acct)
+        mnemonics.append(my_mnem + '\n')
         with open(filename, 'w') as file:
-            file.writelines(mock_mnemonics)
+            file.writelines(mnemonics)
+    else:
+        # Use existing mnemonic to recreate the account
+        my_mnem = mnemonics[keyId].strip()
+        acct = eth_account.Account.from_mnemonic(my_mnem)
 
-    # Retrieve the mock mnemonic for the requested keyId
-    mnemonic = mock_mnemonics[keyId].strip()
-    print('the line we want is ', mnemonic)
-
-    # Create a new Ethereum account for each mock mnemonic
-    acct = eth_account.Account.create(mnemonic)
-    print('account created'
-    
     # Sign the challenge
     msg = eth_account.messages.encode_defunct(challenge)
     sig = acct.sign_message(msg)
-    print('sign challe ge done')
 
     eth_addr = acct.address
     assert eth_account.Account.recover_message(msg, signature=sig.signature.hex()) == eth_addr, "Failed to sign message properly"
