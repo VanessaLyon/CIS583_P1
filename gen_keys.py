@@ -42,9 +42,11 @@ def get_keys(challenge, keyId, filename="eth_mnemonic.txt"):
     encoded_message = encode_defunct(text=challenge.hex())
     sig = Account.sign_message(encoded_message, private_key)
 
-    # Debugging prints
     recovered_addr = Account.recover_message(encoded_message, signature=sig.signature) 
+    
+    # Debugging prints
     print(f"Address: {eth_addr}")
+    print(f"Recovered address: {recovered_addr}")
     print(f"Message Hash: {sig.messageHash.hex()}")
     print(f"r: {sig.r}")
     print(f"s: {sig.s}")
