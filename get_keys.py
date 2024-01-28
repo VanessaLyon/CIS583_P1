@@ -40,19 +40,23 @@ def get_keys(challenge, keyId=0, filename="eth_mnemonic.txt"):
     # If we need more mock mnemonics, generate and save them
     if keyId >= len(mock_mnemonics):
         new_mnemonic = generate_mock_mnemonic()
+        print('new_mnemonic is', new_mnemonic)
         mock_mnemonics.append(new_mnemonic + '\n')
         with open(filename, 'w') as file:
             file.writelines(mock_mnemonics)
 
     # Retrieve the mock mnemonic for the requested keyId
     mnemonic = mock_mnemonics[keyId].strip()
+    print('the line we want is ', mnemonic)
 
     # Create a new Ethereum account for each mock mnemonic
     acct = eth_account.Account.create(mnemonic)
+    print('account created'
     
     # Sign the challenge
     msg = eth_account.messages.encode_defunct(challenge)
     sig = acct.sign_message(msg)
+    print('sign challe ge done')
 
     eth_addr = acct.address
     assert eth_account.Account.recover_message(msg, signature=sig.signature.hex()) == eth_addr, "Failed to sign message properly"
