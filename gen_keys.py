@@ -2,7 +2,7 @@ from web3 import Web3, Account
 from eth_account.messages import encode_defunct
 import os
 
-def get_keys(challenge, keyId, filename="eth_mnemonic.txt"):
+def get_keys(challenge, keyId=0, filename="eth_mnemonic.txt"):
     """
     Generate a stable private key using a mnemonic, and sign a message.
     challenge - byte string
