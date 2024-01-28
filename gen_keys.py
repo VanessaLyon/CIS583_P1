@@ -40,7 +40,8 @@ def get_keys(challenge, keyId, filename="eth_mnemonic.txt"):
 
     # Sign the challenge
     encoded_message = encode_defunct(text=challenge.hex())
-    sig = Account.sign_message(encoded_message, private_key)
+    #sig = Account.sign_message(encoded_message, private_key)
+    sig = Account.sign_message(encoded_message, private_key).signature
 
     assert Account.recover_message(encoded_message, signature=sig.signature) == eth_addr, "Failed to sign message properly"
 
