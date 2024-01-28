@@ -44,8 +44,11 @@ def get_keys(challenge, keyId, filename="eth_mnemonic.txt"):
 
     # Debugging prints
     recovered_addr = Account.recover_message(encoded_message, signature=sig.signature) 
-    print(f"Expected Address: {eth_addr}")
-    print(f"Recovered Address: {recovered_addr}")
+    print(f"Address: {eth_addr}")
+    print(f"Message Hash: {sig.messageHash.hex()}")
+    print(f"r: {sig.r}")
+    print(f"s: {sig.s}")
+    print(f"v: {sig.v}")
     print(f"Signature: {sig.signature.hex()}")
 
     assert Account.recover_message(encoded_message, signature=sig.signature) == eth_addr, "Failed to sign message properly"
