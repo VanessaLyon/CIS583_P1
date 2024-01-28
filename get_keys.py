@@ -26,6 +26,8 @@ def get_keys(challenge, keyId=0, filename="eth_mnemonic.txt"):
 
     w3 = Web3()
 
+    # Enable unaudited HD wallet features
+    Account.enable_unaudited_hdwallet_features()
 
     # Check if we have enough mnemonics in the file
     try:
