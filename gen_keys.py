@@ -39,7 +39,7 @@ def get_keys(challenge, keyId, filename="eth_mnemonic.txt"):
     eth_addr = account.address
 
     # Sign the challenge
-    encoded_message = encode_defunct(text=challenge.hex())
+    encoded_message = encode_defunct(text=challenge)
     sig = Account.sign_message(encoded_message, private_key)
 
     recovered_addr = Account.recover_message(encoded_message, signature=sig.signature) 
