@@ -1,40 +1,55 @@
-from web3 import Web3
+length of file is 4 
+using existing mnemonic 
+Address: 0x727A8a73171CD7a3c726b7D3119A0161c530E12d 
+Recovered address: 0x727A8a73171CD7a3c726b7D3119A0161c530E12d 
+Message Hash: 0xf7b8ecc83c6b63bf1901f07e26366d56d52aedd05eb8115a2429b48b47fa7a53 
+r: 94343010483293998759083952316790203511358027261856158422595159174534341612511 
+s: 33671077074897696828017966532566077962807409629136516827823243677209339009534 
+v: 28 
+Signature: 0xd094406b970b88ddd23d7b7f35bfca16c16f7cf68bc2e9d4f7c2ae32afe453df4a71277ddd6408efc878adf457e7a1aa251dab666eeeead1e12e7033d3de99fe1c 
+Failure: signature failed to verify 
+Signature: SignedMessage(messageHash=HexBytes('0xf7b8ecc83c6b63bf1901f07e26366d56d52aedd05eb8115a2429b48b47fa7a53'), 
+r=94343010483293998759083952316790203511358027261856158422595159174534341612511, 
+s=33671077074897696828017966532566077962807409629136516827823243677209339009534, 
+v=28, 
+signature=HexBytes('0xd094406b970b88ddd23d7b7f35bfca16c16f7cf68bc2e9d4f7c2ae32afe453df4a71277ddd6408efc878adf457e7a1aa251dab666eeeead1e12e7033d3de99fe1c')) 
+Address: 0x727A8a73171CD7a3c726b7D3119A0161c530E12d 
+Success: 0x727A8a73171CD7a3c726b7D3119A0161c530E12d has 300000000000000000 Wei 
+length of file is 4 
+using existing mnemonic 
+Address: 0x727A8a73171CD7a3c726b7D3119A0161c530E12d 
+Recovered address: 0x727A8a73171CD7a3c726b7D3119A0161c530E12d 
+Message Hash: 0x825596debfe8c86b45e654902c7d7e4ecc9a2a6528fa5f0887c718ad96386369 
+r: 22382096915052087739763943303156230044256788105165929889667624738206501877227 
+s: 20363307977238965145808751787788342904190072720903088965091443749559029371431 
+v: 27 
+Signature: 0x317bd1636d09db0a4bc6429262914b57bbf49040338b425370ab65c10054b5eb2d05394ff9a4be37b8f2a33cf93e8c675dbe717b2d4b4918851ea0a5d4da92271b 
+Failure: signature failed to verify 
+Signature: SignedMessage(messageHash=HexBytes('0x825596debfe8c86b45e654902c7d7e4ecc9a2a6528fa5f0887c718ad96386369'), 
+r=22382096915052087739763943303156230044256788105165929889667624738206501877227, 
+s=20363307977238965145808751787788342904190072720903088965091443749559029371431, 
+v=27, 
+signature=HexBytes('0x317bd1636d09db0a4bc6429262914b57bbf49040338b425370ab65c10054b5eb2d05394ff9a4be37b8f2a33cf93e8c675dbe717b2d4b4918851ea0a5d4da92271b')) 
+Address: 0x727A8a73171CD7a3c726b7D3119A0161c530E12d 
+Success: 0x727A8a73171CD7a3c726b7D3119A0161c530E12d has 1000000000000000000 Wei 
+Run Tests Score : 50.0
+
+At this point, I am returning sig = Account.sign_message(encoded_message, private_key), but maybe I should return another format.
+
+from web3 import Web3, Account
+from eth_account.messages import encode_defunct
 import os
-import binascii
-import mnemonic
-from mnemonic import Mnemonic
-import random
-import string
-
-
-def generate_random_mnemonic():
-    """Generate a random 12-word mnemonic phrase."""
-    word_list = [
-        "apple", "banana", "cherry", "date", "elderberry", "fig", "grape", 
-        "honeydew", "kiwi", "lemon", "mango", "nectarine", "orange", "papaya", 
-        "quince", "raspberry", "strawberry", "tangerine", "grapefruit", 
-        "blueberry", "melon", "coconut", "apricot", "pear", "peach", "plum", 
-        "lychee", "lime", "jackfruit", "guava", "pomegranate", "pineapple"
-    ]
-
-    # Shuffle and select 12 words from the word list
-    selected_words = random.sample(word_list, 12)
-
-    # Join the selected words to create the mnemonic phrase
-    mnemonic_phrase = ' '.join(selected_words)
-
-    return mnemonic_phrase
 
 def get_keys(challenge, keyId, filename="eth_mnemonic.txt"):
     """
-    Generate a stable private key, convert it to a mnemonic, and sign a message.
+    Generate a stable private key using a mnemonic, and sign a message.
     challenge - byte string
     keyId (integer) - which key to use
     filename - filename to read and store mnemonics
     """
 
     w3 = Web3()
-    w3.eth.account.enable_unaudited_hdwallet_features()
+    Account.enable_unaudited_hdwallet_features()
 
     # Check if we have enough mnemonics in the file
     mnemonics = []
@@ -44,29 +59,39 @@ def get_keys(challenge, keyId, filename="eth_mnemonic.txt"):
     except FileNotFoundError:
         mnemonics = []
 
-    print('lenght of file is ', len(mnemonics))
+    print('length of file is ', len(mnemonics))
 
     # If we need more mnemonics, generate and save them
     if keyId >= len(mnemonics):
-        mnemonic_phrase = generate_random_mnemonic()
+        account, mnemonic_phrase = Account.create_with_mnemonic()
         print('phrase: ', mnemonic_phrase)
         mnemonics.append(mnemonic_phrase + '\n')
         with open(filename, 'w') as file:
             file.writelines(mnemonics)
     else:
-        print('we are in the else')
-        # Use an existing mnemonic to recreate the private key
+        print('using existing mnemonic')
         mnemonic_phrase = mnemonics[keyId].strip()
+        account = Account.from_mnemonic(mnemonic_phrase)
 
-    # Derive the Ethereum address from the mnemonic phrase
-    private_key = w3.eth.account.from_mnemonic(mnemonic_phrase).privateKey
-    eth_addr = w3.eth.account.privateKeyToAccount(private_key).address
+    private_key = account.key
+    eth_addr = account.address
 
     # Sign the challenge
-    msg = w3.eth.account.encode_defunct(challenge)
-    sig = w3.eth.account.signHash(msg, private_key=private_key)
+    encoded_message = encode_defunct(text=challenge)
+    sig = Account.sign_message(encoded_message, private_key)
 
-    assert w3.eth.account.recoverHash(msg, signature=sig.signature.hex()) == eth_addr, "Failed to sign message properly"
+    recovered_addr = Account.recover_message(encoded_message, signature=sig.signature) 
+    
+    # Debugging prints
+    print(f"Address: {eth_addr}")
+    print(f"Recovered address: {recovered_addr}")
+    print(f"Message Hash: {sig.messageHash.hex()}")
+    print(f"r: {sig.r}")
+    print(f"s: {sig.s}")
+    print(f"v: {sig.v}")
+    print(f"Signature: {sig.signature.hex()}")
+
+    assert Account.recover_message(encoded_message, signature=sig.signature) == eth_addr, "Failed to sign message properly"
 
     return sig, eth_addr
 
