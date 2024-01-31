@@ -1,6 +1,8 @@
 from web3 import Web3, Account
 from eth_account.messages import encode_defunct
+from eth_utils.curried import to_hex, to_bytes
 import os
+import base64
 
 def get_keys(challenge, keyId, filename="eth_mnemonic.txt"):
     """
@@ -39,19 +41,24 @@ def get_keys(challenge, keyId, filename="eth_mnemonic.txt"):
     eth_addr = account.address
 
     # Sign the challenge
-    encoded_message = encode_defunct(text=challenge)
+    #encoded_message = encode_defunct(text=challenge.hex())
+    #challenge_converted =  base64.b64encode(challenge).decode('utf-8')
+    #print(challenge)
+    #print(challenge_converted)
+        
+    encoded_message = encode_defunct(challenge)
     sig = Account.sign_message(encoded_message, private_key)
 
     recovered_addr = Account.recover_message(encoded_message, signature=sig.signature) 
     
     # Debugging prints
-    print(f"Address: {eth_addr}")
-    print(f"Recovered address: {recovered_addr}")
-    print(f"Message Hash: {sig.messageHash.hex()}")
-    print(f"r: {sig.r}")
-    print(f"s: {sig.s}")
-    print(f"v: {sig.v}")
-    print(f"Signature: {sig.signature.hex()}")
+    #print(f"Address: {eth_addr}")
+    #print(f"Recovered address: {recovered_addr}")
+    #print(f"Message Hash: {sig.messageHash.hex()}")
+    #print(f"r: {sig.r}")
+    #print(f"s: {sig.s}")
+    #print(f"v: {sig.v}")
+    #print(f"Signature: {sig.signature.hex()}")
 
     Account.recover_message(encoded_message, signature=sig.signature)
     assert Account.recover_message(encoded_message, signature=sig.signature) == eth_addr, "Failed to sign message properly"
